@@ -1,0 +1,9 @@
+# Include your custom_postgui HAL commands here
+# This file will not be overwritten when you run PNCconf again
+
+
+net joint-5-mag-position classicladder.0.floatout-00 j5.limit3.in
+
+net joint-6-atc-position classicladder.0.floatout-01 j6.limit3.in 
+
+net joint-7-shifter-position classicladder.0.floatout-02 j7.limit3.in 

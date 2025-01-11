@@ -1,0 +1,37 @@
+#toolchanger hal file
+
+
+loadrt atc 
+addf atc.0 servo-thread
+
+net J6:out classicladder.0.floatin-02
+
+##########home sensor safety check##########
+net atc-home-switch classicladder.0.in-10
+net atc-tool-pos-1 classicladder.0.in-11 hm2_7i96.0.7i70.0.3.input-11
+net atc-tool-pos-2 classicladder.0.in-12 hm2_7i96.0.7i70.0.3.input-12
+
+
+net tool-sensor-clamped classicladder.0.in-13 hm2_7i96.0.7i70.0.3.input-18
+net tool-sensor-unclamped classicladder.0.in-14 hm2_7i96.0.7i70.0.3.input-19
+
+
+
+
+
+
+
+#######outputs###########3
+net spindle-tool-unclamp classicladder.0.out-02 hm2_7i96.0.7i71.0.2.output-01
+
+
+#############IO control stuff#########################
+
+net tool-prep-pocket iocontrol.0.tool-prep-pocket classicladder.0.s32in-00
+net tool-prepare iocontrol.0.tool-prepare classicladder.0.in-15
+
+
+net mag-feedback classicladder.0.floatin-04 joint.5.pos-fb 
+
+net shifter-feedback classicladder.0.floatin-05 joint.7.pos-fb 
+net tool-prepared classicladder.0.out-07 iocontrol.0.tool-prepared 

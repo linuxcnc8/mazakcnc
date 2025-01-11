@@ -1,0 +1,36 @@
+# Halshow settings
+# This file is generated automatically.
+wm geometry . 552x929+704+29
+placeFrames 0.3457792207792208
+set ::ratio 0.3457792207792208
+set ::old_w_leftf 18
+set ::watchlist {
+    pin+atc.0.out0
+    pin+atc.0.out10
+    pin+atc.0.out20
+    pin+atc.0.out30
+    pin+atc.0.out40
+    pin+atc.0.out50
+    pin+atc.0.out60
+    pin+atc.0.out70
+    pin+atc.0.out100
+    pin+atc.0.out110
+    pin+atc.0.out120
+    pin+atc.0.out130
+    pin+atc.0.out140
+    pin+atc.0.out150
+    pin+atc.0.out160
+    pin+atc.0.atc-change-command
+    pin+atc.0.atc-in-position
+    pin+atc.0.atc-out-position
+    pin+atc.0.state
+    pin+atc.0.state-control
+    pin+atc.0.time
+}
+set ::workmode watchhal
+set ::watchInterval 100
+set ::col1_width 100
+set ::ffmts 
+set ::ifmts 
+set ::alwaysOnTop 0
+set ::autoSaveWatchlist 1
