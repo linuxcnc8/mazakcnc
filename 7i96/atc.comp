@@ -1,0 +1,211 @@
+component atc "ATC component";
+
+pin in bit atc_change_command;
+pin in float atc_in_position;
+
+// Debugging Inputs
+pin in unsigned state_control;
+pin in bit debug;
+
+pin io unsigned state;
+
+
+// Debugging outputs
+pin out bit out0;
+pin out bit out10;
+pin out bit out20;
+pin out bit out30;
+pin out bit out40;
+pin out bit out50;
+pin out bit out60;
+pin out bit out70;
+pin out bit out100;
+pin out bit out110;
+pin out bit out120;
+pin out bit out130;
+pin out bit out140;
+pin out bit out150;
+pin out bit out160;
+pin out bit default_bit;
+pin out float atc_out_position;
+
+function _ fp;
+
+license "GPL";
+author "Andrew Beck 11-1-24";
+;;
+
+
+FUNCTION(_) {
+		
+
+	
+	switch(state) {
+		case 0:
+			default_bit = 0;
+			out160 = 0;
+			out0 = 1;
+			
+
+			if (atc_change_command == 1) {
+
+				if (atc_in_position == 0) {
+					state = 1;
+					
+				}
+
+
+				if (atc_in_position == 500) {
+					state = 100;
+				}
+			}
+
+
+			break;
+
+
+			case 1:
+			default_bit = 0;
+			out160 = 0;
+			out0 = 1;
+			atc_out_position = 0;
+			
+				
+				if (!debug) {
+					state = 10;
+				}
+			
+			break;
+	
+		case 10: 	
+			out0 = 0;
+			out10 = 1;
+			if (atc_in_position == 0) {
+				atc_out_position = 100;
+				
+				if (!debug) {
+					state = 20;
+				}
+			}
+			
+			break;
+			
+		case 20: 
+			out10 = 0;
+			out20 = 1;
+			if (atc_in_position == 100) {
+			atc_out_position = 418;
+				if (!debug) {
+					state = 30;
+				}
+			}
+			
+			
+			break;
+			
+			
+			case 30: 
+			out20 = 0;
+			out30 = 1;
+			if (atc_in_position == 418) {
+			atc_out_position = 500;
+				if (!debug) {
+					state = 40;
+				}
+			}
+			
+			
+			break;
+			
+	
+	
+			case 40: 
+			out30 = 0;
+			out40 = 1;
+			if (atc_in_position == 500) {
+				state = 0;
+				if (!debug) {
+					state = 0;
+				}
+			}
+			
+			break;
+
+
+
+			case 100:
+			default_bit = 0;
+			out40 = 0;
+			out100 = 1;
+			atc_out_position = 500;
+			
+				
+				if (!debug) {
+					state = 110;
+				}
+			
+			break;
+	
+		case 110: 	
+			out100 = 0;
+			out110 = 1;
+			if (atc_in_position == 500) {
+				atc_out_position = 418;
+				
+				if (!debug) {
+					state = 120;
+				}
+			}
+			
+			break;
+			
+		case 120: 
+			out110 = 0;
+			out120 = 1;
+			if (atc_in_position == 418) {
+			atc_out_position = 100;
+				if (!debug) {
+					state = 130;
+				}
+			}
+			
+			
+			break;
+			
+			
+			case 130: 
+			out120 = 0;
+			out130 = 1;
+			if (atc_in_position == 100) {
+			atc_out_position = 0;
+				if (!debug) {
+					state = 140;
+				}
+			}
+			
+			
+			break;
+			
+	
+	
+			case 140: 
+			out130 = 0;
+			out140 = 1;
+			if (atc_in_position == 0) {
+				state = 0;
+				if (!debug) {
+					state = 0;
+				}
+			}
+			
+			break;
+			
+		
+		default:
+			default_bit = 1;
+	}
+}
+
+
+
+
