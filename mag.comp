@@ -1,0 +1,111 @@
+component mag "Toolchanger magazine component";
+
+// inputs
+pin in bit magazine_ready;
+pin in bit shifter_ready;
+
+pin in signed iocontrol_prep_pocket_in;  // iocontrol pocket number in
+pin in float j5_limit3_out;
+pin in bit tool_prepare;
+
+// outputs
+pin out float tool_prep_pocket_out;  // motor output
+pin out bit tool_prepared;
+pin out bit toolchanger_faulted;
+
+
+// Debugging Inputs
+pin io unsigned state;
+
+
+// Debugging outputs
+pin out bit out0;
+pin out bit out10;
+pin out bit default_bit;
+
+
+
+function _ fp;
+
+license "GPL";
+author "Andrew Beck, Luke Beck";
+include <stdlib.h>;
+;;
+
+
+
+FUNCTION(_) {
+
+	int modulo(int value, int range) {
+		// Function assumes range is positive
+		int remainder = value % range;
+		if(remainder < 0) {
+			return remainder + range;
+		}
+		else {
+			return remainder;
+		}
+	}
+
+	float shortest_path(int start, int finish) {
+		// This function calculates distance clockwise.
+		// Calculates distance anticlockwise.
+		// returns modulo of finish (destination)
+		// such that the shortest distance is travelled
+		
+		static int noOfTools, diff, dis_clock, dis_anti_clock, destination;
+		noOfTools = 80;
+		
+		diff = finish - start;
+
+		dis_clock = modulo(diff, noOfTools);
+
+		dis_anti_clock = noOfTools - dis_clock;
+
+		if (dis_anti_clock < dis_clock){
+			destination = start - dis_anti_clock;
+		}
+		else {
+			destination = start + dis_clock;
+		}
+
+		if (abs(destination) >= 80,000,000) {
+			// error
+			toolchanger_faulted = 1;
+		}
+		return destination;
+	}
+
+	
+	static int current_pocket = 1;
+
+	switch (state) {
+		case 0:
+			out10 = 0;
+			out0 = 1;
+			
+			if (tool_prepare == 1) {
+				tool_prepared = 0;
+
+				current_pocket = j5_limit3_out;
+				tool_prep_pocket_out = shortest_path(current_pocket, iocontrol_prep_pocket_in);
+
+				state = 10;
+			}
+			
+			break;
+
+		case 10:
+			out0 = 0;
+			out10 = 1;
+
+			if (j5_limit3_out == tool_prep_pocket_out) {
+				tool_prepared = 1;
+				state = 0;
+			}
+
+		default:
+			default_bit = 1;
+			break;
+	}
+}
