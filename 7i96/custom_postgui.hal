@@ -2,8 +2,12 @@
 # This file will not be overwritten when you run PNCconf again
 
 
-net joint-5-mag-position classicladder.0.floatout-00 j5.limit3.in
+########extra stuff i think needs to be loaded after linuxcnc starts up#######
+net joint-5-mag-position mag.0.tool-prep-pocket-out 
+net J6:out atc.0.atc-in-position
+net joint-6-atc-position j6.limit3.in atc.0.atc-out-position 
 
-net joint-6-atc-position classicladder.0.floatout-01 j6.limit3.in 
+########extra stuff i think needs to be loaded after linuxcnc starts up#######
 
-net joint-7-shifter-position classicladder.0.floatout-02 j7.limit3.in 
+
+ 

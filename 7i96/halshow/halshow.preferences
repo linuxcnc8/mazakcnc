@@ -1,0 +1,25 @@
+# Halshow settings
+# This file is generated automatically.
+wm geometry . 496x808+399+68
+placeFrames 0.13636363636363635
+set ::ratio 0.13636363636363635
+set ::old_w_leftf 18
+set ::watchlist {
+    pin+j5.limit3.enable
+    pin+j5.limit3.in
+    pin+j5.limit3.load
+    pin+j5.limit3.max
+    pin+j5.limit3.maxa
+    pin+j5.limit3.maxv
+    pin+j5.limit3.min
+    pin+j5.limit3.out
+    pin+j5.limit3.smooth-steps
+    pin+j5.limit3.time
+}
+set ::workmode watchhal
+set ::watchInterval 100
+set ::col1_width 100
+set ::ffmts 
+set ::ifmts 
+set ::alwaysOnTop 0
+set ::autoSaveWatchlist 1

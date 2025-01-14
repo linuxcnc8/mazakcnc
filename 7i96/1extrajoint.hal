@@ -209,7 +209,7 @@ net  J6:enable => j6.limit3.enable
 
 
 
-#net joint-7-shifter-position classicladder.0.floatout-02 j6.limit3.in 
+#net joint-7-shifter-position classicladder.0.floatout-02 j7.limit3.in 
 #in post gui hal file^
 #--------------------------------------------
 # extra joint (joint7)
