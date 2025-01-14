@@ -5,13 +5,21 @@ pin in bit magazine_ready;
 pin in bit shifter_ready;
 
 pin in signed iocontrol_prep_pocket_in;  // iocontrol pocket number in
-pin in float j5_limit3_out;
+pin in float j5_limit3_out;				 // shifter pos fb from j7.limit3.out
+pin in float j7_limit3_out;
 pin in bit tool_prepare;
+pin in bit shifter_clamped_sensor;
+pin in bit shifter_unclamped_sensor;
+pin in bit atc_changed;
 
 // outputs
 pin out float tool_prep_pocket_out;  // motor output
+pin out float shifter_pos_cmd;  	// motor output
 pin out bit tool_prepared;
 pin out bit toolchanger_faulted;
+pin out bit shifter_clamp;
+pin out bit shifter_unclamp;
+
 
 
 // Debugging Inputs
@@ -19,8 +27,6 @@ pin io unsigned state;
 
 
 // Debugging outputs
-pin out bit out0;
-pin out bit out10;
 pin out bit default_bit;
 
 
@@ -76,33 +82,210 @@ FUNCTION(_) {
 		return destination;
 	}
 
-	
+
+	int rising_edge (int *prev, int new) {
+		/*
+			Pointers are used to pass the address of prev
+			to this function.  This means that the value of 
+			prev will be updated in the function which called this function.
+
+			Pass the address of prev like this 
+			result = rising_edge(&prev, new);
+
+			The & is the important thing here.
+		*/
+		int result;
+		if (*prev != new){
+			// Input has changed
+			if(new == 1){
+				result = 1;
+			}
+			else {
+				result = 0;
+			}
+		}
+		else {
+			result = 0;
+		}
+		*prev = new;
+		return result;
+	}
+
+	// Rising Edge atc_changed interlock
+	static int shifter_run = 0;
+	static int prev_atc_changed = 0;
+
+	shifter_run = rising_edge(&prev_atc_changed, atc_changed);
+
+
 	static int current_pocket = 1;
+	static int current_prep_pocket;
 
 	switch (state) {
 		case 0:
-			out10 = 0;
-			out0 = 1;
 			
-			if (tool_prepare == 1) {
-				tool_prepared = 0;
+			if (tool_prepare == 1 && j7_limit3_out > -605) {
+				
+				shifter_pos_cmd = -600;
+				shifter_clamp = 0;
+				shifter_unclamp = 1;				
 
+				
 				current_pocket = j5_limit3_out;
 				tool_prep_pocket_out = shortest_path(current_pocket, iocontrol_prep_pocket_in);
+				current_prep_pocket = iocontrol_prep_pocket_in;
 
 				state = 10;
+				
 			}
 			
 			break;
 
 		case 10:
-			out0 = 0;
-			out10 = 1;
+			
 
-			if (j5_limit3_out == tool_prep_pocket_out) {
-				tool_prepared = 1;
-				state = 0;
+			if (j5_limit3_out == tool_prep_pocket_out && shifter_unclamped_sensor && !shifter_clamped_sensor) {
+				shifter_pos_cmd = -757;
+				state = 20;
 			}
+
+			break;
+
+
+		case 20:
+			
+
+			if (j7_limit3_out == -757) {
+				shifter_unclamp = 0;
+				shifter_clamp = 1;
+				
+				state = 30;
+			}
+
+			break;
+
+
+
+		case 30:
+			
+
+			if (shifter_clamped_sensor && !shifter_unclamped_sensor) {
+				shifter_pos_cmd = 197;
+				state = 40;
+			}
+
+			break;
+
+		case 40:
+			
+
+			if (j7_limit3_out == 197) {
+				shifter_clamp = 0;
+				shifter_unclamp = 1;
+				state = 50;
+			}
+
+			break;
+
+
+		case 50:
+			
+
+			if (shifter_unclamped_sensor && !shifter_clamped_sensor) {
+				shifter_pos_cmd = 0;
+				state = 60;
+			}
+
+			break;
+
+		case 60:
+			
+
+			if (j7_limit3_out == 0) {
+				tool_prepared = 1;
+				state = 70;
+			}
+
+			break;
+
+		case 70:
+			if(current_prep_pocket != iocontrol_prep_pocket_in) {
+				toolchanger_faulted = 1;
+			} else {
+				if(shifter_run) {
+					shifter_clamp = 0;
+					shifter_unclamp = 1;
+
+					tool_prepared = 0;
+					state = 80;
+				}
+			}
+			break;
+
+		case 80:
+			
+
+			if (shifter_unclamped_sensor && !shifter_clamped_sensor) {
+				shifter_pos_cmd = 197;
+				state = 90;
+			}
+
+			break;
+
+		case 90:
+			if(j7_limit3_out == 197){
+			shifter_unclamp = 0;
+			shifter_clamp = 1;
+			state = 100;
+
+			}
+
+			break;
+
+
+		
+
+
+		case 100:
+
+			if (shifter_clamped_sensor && !shifter_unclamped_sensor) {
+				shifter_pos_cmd = -757;
+				state = 110;
+			}
+			
+			break;
+
+		case 110:
+
+			if(j7_limit3_out == -757){
+			shifter_clamp = 0;
+			shifter_unclamp = 1;
+			state = 120;
+
+			}
+
+			break;
+
+
+		case 120:
+			if (shifter_unclamped_sensor && !shifter_clamped_sensor){
+				shifter_pos_cmd = -600;
+				state = 130;
+
+
+			}
+			
+			break;
+
+
+		case 130:
+			if (j7_limit3_out == -600){
+				state = 0;
+
+
+			}
+			
+			break;
 
 		default:
 			default_bit = 1;
